@@ -126,11 +126,11 @@ public static class DxfProjectExporter
         dxf.Line(x + 150, y + 100, x + w - 150, y + 100, "REBAR_BOTTOM");
         dxf.Line(x + 150, y + h - 100, x + w - 150, y + h - 100, "REBAR_TOP");
 
-        for (double pos = 0; pos <= r.BeamLength; pos += r.StirrupSpacing)
-        {
-            double sx = x + pos * scale;
-            dxf.Line(sx, y, sx, y + h, "STIRRUP");
-        }
+     for (double pos = 0; pos <= r.BeamLength; pos += r.StirrupSpacing)
+{
+    double stirrupX = x + pos * scale;
+    dxf.Line(stirrupX, y, stirrupX, y + h, "STIRRUP");
+}
 
         double sx = ox;
         double sy = oy - 2600;
