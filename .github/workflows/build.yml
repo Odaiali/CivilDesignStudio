@@ -26,11 +26,8 @@ jobs:
           Write-Host "`nProject file:"
           Get-Item .\CivilDesignBeam.csproj
 
-          Write-Host "`nSource folders:"
-          Get-ChildItem -Directory
-
       - name: Restore
-        run: dotnet restore CivilDesignBeam.csproj --verbosity normal
+        run: dotnet restore CivilDesignBeam.csproj -r win-x64 --verbosity normal
 
       - name: Build Release
         run: >
