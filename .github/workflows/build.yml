@@ -16,7 +16,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
+      - name: Use .NET 8 SDK
+        shell: pwsh
+        run: |
+          dotnet --list-sdks
+          dotnet --version
       - name: Show project files
         shell: pwsh
         run: |
