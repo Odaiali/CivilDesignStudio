@@ -33,13 +33,7 @@ jobs:
       - name: Restore
         run: dotnet restore CivilDesignBeam.csproj -r win-x64 --verbosity normal
 
-      - name: Build Release
-        run: >
-          dotnet build CivilDesignBeam.csproj
-          -c Release
-          --no-restore
-          --verbosity normal
-
+ 
       - name: Publish Windows EXE
         run: >
           dotnet publish CivilDesignBeam.csproj
@@ -47,7 +41,6 @@ jobs:
           -r win-x64
           --self-contained true
           --no-restore
-          --no-build
           -p:PublishReadyToRun=false
           -o publish
 
