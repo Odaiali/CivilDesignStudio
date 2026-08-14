@@ -2,12 +2,11 @@ name: Build Civil Design Studio
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
 
 jobs:
   build-windows:
     runs-on: windows-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -18,28 +17,65 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore
-        run: dotnet restore CivilDesignBeam.csproj
+      - name: Show project files
+        shell: pwsh
+        run: |
+          Write-Host "Current directory:"
+          Get-Location
 
-      - name: Publish EXE
+          Write-Host "`nProject file:"
+          Get-Item .\CivilDesignBeam.csproj
+
+          Write-Host "`nSource folders:"
+          Get-ChildItem -Directory
+
+      - name: Restore
+        run: dotnet restore CivilDesignBeam.csproj --verbosity normal
+
+      - name: Build Release
+        run: >
+          dotnet build CivilDesignBeam.csproj
+          -c Release
+          --no-restore
+          --verbosity normal
+
+      - name: Publish Windows EXE
         run: >
           dotnet publish CivilDesignBeam.csproj
           -c Release
           -r win-x64
           --self-contained true
+          --no-restore
+          --no-build
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:PublishReadyToRun=false
           -o publish
 
+      - name: Check EXE
+        shell: pwsh
+        run: |
+          Write-Host "Published files:"
+          Get-ChildItem .\publish -Recurse
+
+          if (-not (Test-Path ".\publish\CivilDesignBeam.exe")) {
+              Write-Error "CivilDesignBeam.exe was not created."
+              exit 1
+          }
+
       - name: Create ZIP package
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          Compress-Archive -Path publish\* -DestinationPath artifacts\CivilDesignStudio-win-x64.zip -Force
+
+          Compress-Archive `
+            -Path publish\* `
+            -DestinationPath artifacts\CivilDesignStudio-win-x64.zip `
+            -Force
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: CivilDesignStudio-win-x64
           path: artifacts/CivilDesignStudio-win-x64.zip
+          if-no-files-found: error
